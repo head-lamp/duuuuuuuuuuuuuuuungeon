@@ -18,13 +18,14 @@ max_width = 5000
 cells = 150
 
 class Room:
-    def __init__(self, position, width, height, maxWidth, maxHeight, grid):
+    def __init__(self, position, width, height, grid):
         self.position = position
         self.x = position[0]
         self.y = position[1]
         self.width = width
         self.height = height
         self.neighbors = list()
+        self.isMainRoom = False
 
     @property
     def left(self):
@@ -64,15 +65,28 @@ class Room:
         return False
 
 class Dungeon:
-    def __init__(self, radius, numOfRooms, width=None, height=None, grid=None):
+    def __init__(self, radius, numOfRooms, maxWidth, maxHeight, grid=None):
         self.rooms = None
+        self.maxWidth = maxWidth
+        self.maxHeight = maxHeight
+        self.generate(radius, numOfRooms)
+
+    @property
+    def mainRooms(self):
+        return filter(lambda room: room.isMainRoom, self.rooms)
+
+    def generate(self, radius, numOfRooms):
         self.placeRooms(radius, numOfRooms)
+        self.pickMainRooms()
 
     def placeRooms(self, radius, numOfRooms):
         rooms = []
         for x in range(numOfRooms):
             pos = getRandomPointInCircle(radius)
-            rooms.append(Room(pos, 32, 32, 16, 16, 4))
+            random.randint(1,self.maxWidth)
+            w = random.randint(1,self.maxWidth)
+            h = random.randint(1,self.maxHeight)
+            rooms.append(Room(pos, w, h, 4))
         self.rooms = rooms
 
         count = 0
@@ -86,6 +100,7 @@ class Dungeon:
                 done = False
             print(collisions)
 
+        print("coords")
         pprint(list(map(lambda room: (room.x, room.y), rooms)))
         return rooms
 
@@ -98,11 +113,17 @@ class Dungeon:
                     collisions += 1
                     j.repulse(i)
 
-        if (collisions) == 0:
-            print('really?')
-
         return collisions
-        
+
+    def pickMainRooms(self):
+        numOfRooms = len(self.rooms)
+        avgW = sum([room.width for room in self.rooms]) / numOfRooms
+        avgH = sum([room.height for room in self.rooms]) / numOfRooms
+        for room in self.rooms:
+            if room.width > avgW and room.height > avgH:
+                room.isMainRoom = True
+        print("main room coords")
+        pprint([room.position for room in self.mainRooms])
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
 
@@ -121,7 +142,7 @@ def main():
     numOfRooms = 20
     radius = 80
     
-    dungeon = Dungeon(radius, numOfRooms)
+    dungeon = Dungeon(radius, numOfRooms, 64, 64)
 
 if __name__ == '__main__':
     main()
