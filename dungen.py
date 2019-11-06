@@ -87,6 +87,7 @@ class Dungeon:
     def generate(self, radius, numOfRooms):
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
+        self.generateGraph()
         plot(self)
 
     # place the rooms and scatter them out
@@ -138,6 +139,14 @@ class Dungeon:
         print("main room coords")
         pprint([room.position for room in self.mainRooms])
 
+    def generateGraph(self):
+        points = np.array([room.position for room in self.mainRooms])
+        tri = Delaunay(points)
+        edges = points[tri.simplices]
+        print("triangle = tri")
+        pprint(edges)
+
+
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
 
 def getRandomPointInCircle(radius, tile_size=4):
@@ -154,7 +163,7 @@ def getRandomPointInCircle(radius, tile_size=4):
 def plot(dungeon):
     points = np.array([ room.position for room in dungeon.rooms])
     plt.scatter([x[0] for x in points], [y[1] for y in points])
-    plt.show()
+    #plt.show()
 
 def main():
     numOfRooms = 20
