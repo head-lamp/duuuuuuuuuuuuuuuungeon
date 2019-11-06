@@ -2,8 +2,11 @@ import math
 import random
 import sys
 from pprint import pprint 
+import uuid
 
-import itertools 
+from scipy.spatial import Delaunay
+import numpy as np
+import matplotlib.pyplot as plt
 
 #import pyglet 
 
@@ -26,6 +29,8 @@ class Room:
         self.height = height
         self.neighbors = list()
         self.isMainRoom = False
+        # might need a unqiue id for the graph, idk
+        self.id = uuid.uuid4()
 
     @property
     def left(self):
@@ -43,15 +48,18 @@ class Room:
     def bottom(self):
         return self.y - (self.height/2)
 
-    def getDistanceBetweenRoom(self, room):
-        return math.sqrt((room.x - self.x) ** 2 + (room.y - self.y)**2)
+    # unused, get distance between two rooms
+    #def getDistanceBetweenRoom(self, room):
+    #    return math.sqrt((room.x - self.x) ** 2 + (room.y - self.y)**2)
 
+    # push the room in the opposite direction
     def repulse(self, room):
         dx = (self.x - room.x)
         dy = (self.y - room.y)
         self.x += dx + random.randint(-10, 10) * random.randint(-1, -1)
         self.y += dy + random.randint(-10, 10) * random.randint(-1, -1)
 
+    # check if the room is colliding
     def isRoomOverlap(self, room):
         if (self.left > room.right or room.left > self.right):
             return False
@@ -59,10 +67,11 @@ class Room:
             return False
         return True
 
-    def isPointInsideRoom(self, x, y, room):
-        if (x > room.left) and (x < room.right) and (y < room.top) and (y > room.bottom):
-            return True
-        return False
+    # unused, and probably kind of useless
+    #def isPointInsideRoom(self, x, y, room):
+    #    if (x > room.left) and (x < room.right) and (y < room.top) and (y > room.bottom):
+    #        return True
+    #    return False
 
 class Dungeon:
     def __init__(self, radius, numOfRooms, maxWidth, maxHeight, grid=None):
@@ -78,7 +87,9 @@ class Dungeon:
     def generate(self, radius, numOfRooms):
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
+        plot(self)
 
+    # place the rooms and scatter them out
     def placeRooms(self, radius, numOfRooms):
         rooms = []
         for x in range(numOfRooms):
@@ -89,6 +100,8 @@ class Dungeon:
             rooms.append(Room(pos, w, h, 4))
         self.rooms = rooms
 
+        # scatter rooms around, check if there are collisions
+        # if there are collisions go ahead and scatter em again
         count = 0
         done = False
         while not done:
@@ -135,9 +148,14 @@ def getRandomPointInCircle(radius, tile_size=4):
         r = 2 - u
     else:
         r = u
-    return roundm(radius * r * math.cos(t), tile_size), roundm(radius * r * math.sin(t), tile_size)
-        
-    
+    return roundm(radius * r * math.cos(t), tile_size), \
+         roundm(radius * r * math.sin(t), tile_size)
+
+def plot(dungeon):
+    points = np.array([ room.position for room in dungeon.rooms])
+    plt.scatter([x[0] for x in points], [y[1] for y in points])
+    plt.show()
+
 def main():
     numOfRooms = 20
     radius = 80
