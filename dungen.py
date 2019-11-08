@@ -86,7 +86,8 @@ class Dungeon:
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
         mainRoomGraph = self.generateGraph()
-        plot(self)
+        pprint(mainRoomGraph)
+        #plot(self)
 
     # place the rooms and scatter them out
     def placeRooms(self, radius, numOfRooms):
@@ -142,6 +143,8 @@ class Dungeon:
     # has nodes has edges
     # don't really know what exactly I need yet
     # need it to be used for a minimal spanning tree
+    # although could just use this
+    # https://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.sparse.csgraph.minimum_spanning_tree.html
     def generateGraph(self):
         points = np.array([room.position for room in self.mainRooms])
         tri = Delaunay(points)
