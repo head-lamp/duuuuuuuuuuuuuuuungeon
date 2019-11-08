@@ -142,9 +142,17 @@ class Dungeon:
     def generateGraph(self):
         points = np.array([room.position for room in self.mainRooms])
         tri = Delaunay(points)
-        edges = points[tri.simplices]
-        print("triangle = tri")
-        pprint(edges)
+        tri_edges = points[tri.simplices]
+        graph = {node.position:{'id': node.id, 'edges':set()} for node in self.mainRooms}
+        edges = []
+        for edge_group in tri_edges:
+            print('edge groups')
+            print(edge_group)
+            for edge in edge_group:
+                print('edge')
+                node = graph[tuple(edge)]
+                node['edges'].update( (tuple(x) for x in tuple(edge_group)))
+        pprint(graph)
 
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
@@ -161,7 +169,7 @@ def getRandomPointInCircle(radius, tile_size=4):
          roundm(radius * r * math.sin(t), tile_size)
 
 def plot(dungeon):
-    points = np.array([ room.position for room in dungeon.rooms])
+    points = np.array([ room.position for room in dungeon.mainRooms])
     plt.scatter([x[0] for x in points], [y[1] for y in points])
     #plt.show()
 
