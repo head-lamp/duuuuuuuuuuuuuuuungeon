@@ -18,8 +18,6 @@ max_width = 5000
 #black = 255, 255, 0
 #window = pyglet.window.Window()
 
-cells = 150
-
 class Room:
     def __init__(self, position, width, height, grid):
         self.position = position
@@ -87,7 +85,7 @@ class Dungeon:
     def generate(self, radius, numOfRooms):
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
-        self.generateGraph()
+        mainRoomGraph = self.generateGraph()
         plot(self)
 
     # place the rooms and scatter them out
@@ -136,9 +134,14 @@ class Dungeon:
         for room in self.rooms:
             if room.width > avgW and room.height > avgH:
                 room.isMainRoom = True
-        print("main room coords")
-        pprint([room.position for room in self.mainRooms])
+        #print("main room coords")
+        #pprint([room.position for room in self.mainRooms])
 
+    #
+    # I think this is basically a graph
+    # has nodes has edges
+    # don't really know what exactly I need yet
+    # need it to be used for a minimal spanning tree
     def generateGraph(self):
         points = np.array([room.position for room in self.mainRooms])
         tri = Delaunay(points)
@@ -146,13 +149,15 @@ class Dungeon:
         graph = {node.position:{'id': node.id, 'edges':set()} for node in self.mainRooms}
         edges = []
         for edge_group in tri_edges:
-            print('edge groups')
-            print(edge_group)
+            #print('edge groups')
+            #print(edge_group)
             for edge in edge_group:
-                print('edge')
+                #print('edge')
                 node = graph[tuple(edge)]
                 node['edges'].update( (tuple(x) for x in tuple(edge_group)))
-        pprint(graph)
+
+        #pprint(graph)
+        return graph
 
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
