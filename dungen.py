@@ -5,6 +5,8 @@ from pprint import pprint
 import uuid
 
 from scipy.spatial import Delaunay
+from scipy.sparse import csgraph
+from scipy.sparse import csr_matrix
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -65,6 +67,20 @@ class Room:
             return False
         return True
 
+    # if its not in the in the neighborhood its ok
+    def isGoodNeighbor(self, room):
+        if self == room:
+            return False
+        if self.neighbors.count(room) != 0:
+            return False
+        return True
+
+    def setClosestNeighbors(self, rooms, limit):
+        neighborhood = {}
+        for room in rooms:
+            if self.isGoodNeighbor(room):
+                neighborhood.setDefault()
+
     # unused, and probably kind of useless
     #def isPointInsideRoom(self, x, y, room):
     #    if (x > room.left) and (x < room.right) and (y < room.top) and (y > room.bottom):
@@ -87,6 +103,7 @@ class Dungeon:
         self.pickMainRooms()
         mainRoomGraph = self.generateGraph()
         pprint(mainRoomGraph)
+        mst = self.getMinimalSpanningTree()
         #plot(self)
 
     # place the rooms and scatter them out
@@ -137,6 +154,27 @@ class Dungeon:
                 room.isMainRoom = True
         #print("main room coords")
         #pprint([room.position for room in self.mainRooms])
+
+    def getMinimalSpanningTree(self):
+        edges = []
+        points = np.array([room.position for room in self.mainRooms])
+        tri = Delaunay(points)
+        tri_edges = points[tri.simplices]
+        edges = []
+        for edge_group in tri_edges:
+            for edge in edge_group:
+                edges.append(edge)
+        print("EDGES")
+        print(csr_matrix(edges))
+        print("Shapes")
+        print(csr_matrix(edges).shape)
+        csgraph.minimum_spanning_tree(csr_matrix(edges))
+
+    #
+    def genMainRoomGraph(self, maxEdges=2):
+        rooms = self.mainRooms
+        for room in rooms:
+            room.setClosestNeighbors(rooms,maxEdges)
 
     #
     # I think this is basically a graph
