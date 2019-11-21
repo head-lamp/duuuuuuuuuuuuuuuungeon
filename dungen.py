@@ -102,7 +102,7 @@ class Dungeon:
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
         mainRoomGraph = self.generateGraph()
-        pprint(mainRoomGraph)
+        #pprint(mainRoomGraph)
         mst = self.getMinimalSpanningTree()
         #plot(self)
 
@@ -164,11 +164,11 @@ class Dungeon:
         for edge_group in tri_edges:
             for edge in edge_group:
                 edges.append(edge)
-        print("EDGES")
-        print(csr_matrix(edges))
-        print("Shapes")
-        print(csr_matrix(edges).shape)
-        csgraph.minimum_spanning_tree(csr_matrix(edges))
+        #print("EDGES")
+        #print(csr_matrix(edges))
+        #print("Shapes")
+        #print(csr_matrix(edges).shape)
+        #csgraph.minimum_spanning_tree(csr_matrix(edges))
 
     #
     def genMainRoomGraph(self, maxEdges=2):
