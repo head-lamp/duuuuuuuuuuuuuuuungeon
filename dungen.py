@@ -159,8 +159,6 @@ class Dungeon:
         for room in self.rooms:
             if room.width > avgW and room.height > avgH:
                 room.isMainRoom = True
-        #print("main room coords")
-        #pprint([room.position for room in self.mainRooms])
 
     def minDistRoomIdx(self, v, mstSet, rooms):
         print('v = '+str(v))
@@ -186,9 +184,7 @@ class Dungeon:
         # number of vertices
         nv = len(self.mainRooms)
 
-        parent = [None] * nv
         mstSet = [False] * nv
-        parent[0] = -1
 
         for v in range(nv):
             idx = self.minDistRoomIdx(v, mstSet, self.mainRooms)
@@ -204,51 +200,7 @@ class Dungeon:
 
         for edge in edges:
             print(edge[0].position, edge[1].position)
-
-
-    def makeMst(self):
-        points = np.array([room.position for room in self.mainRooms])
-        tri = Delaunay(points)
-        print(tri.edges)
-        
-
-    #
-    #def genMainRoomGraph(self, maxEdges=2):
-    #    rooms = self.mainRooms
-    #    for room in rooms:
-    #        room.setClosestNeighbors(rooms,maxEdges)
-    #    #print("rooms")
-    #    for room in rooms:
-    #        pprint(room.neighborhood)
-
-    #
-    # I think this is basically a graph
-    # has nodes has edges
-    # don't really know what exactly I need yet
-    # need it to be used for a minimal spanning tree
-    # although could just use this
-    # https://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.sparse.csgraph.minimum_spanning_tree.html
-    def generateGraph(self):
-        points = np.array([room.position for room in self.mainRooms])
-        tri = Delaunay(points)
-        tri_edges = points[tri.simplices]
-        graph = {node.position:{'id': node.id, 'edges':set()} for node in self.mainRooms}
-        edges = []
-        for edge_group in tri_edges:
-            #print('edge groups')
-            #print(edge_group)
-            for edge in edge_group:
-                #print('edge')
-                node = graph[tuple(edge)]
-                node['edges'].update( (tuple(x) for x in tuple(edge_group)))
-
-        #pprint(graph)
-        return graph
-
-    def kruskalMST(self, graph):
-        result = []
-        i = 0
-        e = 0
+        return list(edges)
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
 
