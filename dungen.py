@@ -174,8 +174,6 @@ class Dungeon:
                 minDist = dist
                 min_index = i
 
-        print('v = '+str(v))
-        print('min_index = '+str(min_index))
         return min_index
 
     def getMinimalSpanningTree(self):
@@ -188,6 +186,7 @@ class Dungeon:
 
         for v in range(nv):
             idx = self.minDistRoomIdx(v, mstSet, self.mainRooms)
+            mstSet[idx] == True
 
             edge = (self.mainRooms[v], self.mainRooms[idx])
             if edge not in edges and edge[::-1] not in edges:
