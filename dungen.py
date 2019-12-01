@@ -10,6 +10,8 @@ from scipy.sparse import csr_matrix
 import numpy as np
 import matplotlib.pyplot as plt
 
+import networkx as nx
+
 #import pyglet 
 
 max_height = 5000
@@ -48,9 +50,9 @@ class Room:
     def bottom(self):
         return self.y - (self.height/2)
 
-    # unused, get distance between two rooms
-    #def getDistanceBetweenRoom(self, room):
-    #    return math.sqrt((room.x - self.x) ** 2 + (room.y - self.y)**2)
+    # get distance between two rooms
+    def getDist(self, room):
+        return abs(math.sqrt((room.x - self.x) ** 2 + (room.y - self.y)**2))
 
     # push the room in the opposite direction
     def repulse(self, room):
@@ -79,7 +81,12 @@ class Room:
         neighborhood = {}
         for room in rooms:
             if self.isGoodNeighbor(room):
-                neighborhood.setDefault()
+                neighborhood.setdefault(self.getDist(room))
+        pprint(neighborhood)
+
+        # newNeighbors = [neighborhood[d] for d in sorted(neighborhood)][:limit]
+        self.neighbors.extend(neighborhood)
+        
 
     # unused, and probably kind of useless
     #def isPointInsideRoom(self, x, y, room):
@@ -96,14 +103,14 @@ class Dungeon:
 
     @property
     def mainRooms(self):
-        return filter(lambda room: room.isMainRoom, self.rooms)
+        return list(filter(lambda room: room.isMainRoom, self.rooms))
 
     def generate(self, radius, numOfRooms):
         self.placeRooms(radius, numOfRooms)
         self.pickMainRooms()
-        mainRoomGraph = self.generateGraph()
-        pprint(mainRoomGraph)
+        #pprint(mainRoomGraph)
         mst = self.getMinimalSpanningTree()
+        #self.genMainRoomGraph()
         #plot(self)
 
     # place the rooms and scatter them out
@@ -155,26 +162,64 @@ class Dungeon:
         #print("main room coords")
         #pprint([room.position for room in self.mainRooms])
 
+    def minDistRoomIdx(self, v, mstSet, rooms):
+        print('v = '+str(v))
+        minDist = math.inf
+        min_index = 0
+        for i in range(len(rooms)):
+            if i == v: continue
+
+            room = rooms[i]
+
+            dist = rooms[v].getDist(room)
+            if dist < minDist and mstSet[i] == False:
+                minDist = dist
+                min_index = i
+
+        print('v = '+str(v))
+        print('min_index = '+str(min_index))
+        return min_index
+
     def getMinimalSpanningTree(self):
-        edges = []
+        # set of tuples
+        edges = set()
+        # number of vertices
+        nv = len(self.mainRooms)
+
+        parent = [None] * nv
+        mstSet = [False] * nv
+        parent[0] = -1
+
+        for v in range(nv):
+            idx = self.minDistRoomIdx(v, mstSet, self.mainRooms)
+
+            edge = (self.mainRooms[v], self.mainRooms[idx])
+            if edge not in edges and edge[::-1] not in edges:
+                edges.add( (self.mainRooms[v], self.mainRooms[idx]) )
+            
+
+        for v in range(len(self.mainRooms)):
+            print(v)
+        
+
+        for edge in edges:
+            print(edge[0].position, edge[1].position)
+
+
+    def makeMst(self):
         points = np.array([room.position for room in self.mainRooms])
         tri = Delaunay(points)
-        tri_edges = points[tri.simplices]
-        edges = []
-        for edge_group in tri_edges:
-            for edge in edge_group:
-                edges.append(edge)
-        print("EDGES")
-        print(csr_matrix(edges))
-        print("Shapes")
-        print(csr_matrix(edges).shape)
-        csgraph.minimum_spanning_tree(csr_matrix(edges))
+        print(tri.edges)
+        
 
     #
-    def genMainRoomGraph(self, maxEdges=2):
-        rooms = self.mainRooms
-        for room in rooms:
-            room.setClosestNeighbors(rooms,maxEdges)
+    #def genMainRoomGraph(self, maxEdges=2):
+    #    rooms = self.mainRooms
+    #    for room in rooms:
+    #        room.setClosestNeighbors(rooms,maxEdges)
+    #    #print("rooms")
+    #    for room in rooms:
+    #        pprint(room.neighborhood)
 
     #
     # I think this is basically a graph
@@ -200,6 +245,10 @@ class Dungeon:
         #pprint(graph)
         return graph
 
+    def kruskalMST(self, graph):
+        result = []
+        i = 0
+        e = 0
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
 
