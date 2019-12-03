@@ -229,9 +229,9 @@ class Dungeon:
                 room = rooms[i]
                 dist = rooms[v].getDist(room)
                 
-                edgeFree  = (idx, v) not in mstEdges and (v, idx) not in mstEdges
+                hasEdge = (i, v) in mstEdges or (v, i) in mstEdges
 
-                if edgeFree:
+                if not hasEdge:
                     print('minDist')
                     print(minDist)
                     print('dist')
@@ -243,8 +243,7 @@ class Dungeon:
 
             if minDist != 999999999:
                 howmanyminsgotset += 1
-            if idx == None:
-                print('seriously?')
+
             edges.add( (self.mainRooms[v], self.mainRooms[idx]) )
 
             hasEdge = (idx, v) in mstEdges or (v, idx) in mstEdges
