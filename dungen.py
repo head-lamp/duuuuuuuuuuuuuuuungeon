@@ -215,13 +215,13 @@ class Dungeon:
 
     def getMinimalSpanningTree(self):
         edges = set()
-        nv = len(self.mainRooms)
         rooms = self.mainRooms
         mstEdges = set()
 
-        for v in range(nv):
+        howmanyminsgotset = 0
+        for v in range(len(rooms)):
             minDist = 999999999
-            idx = 0
+            idx = None
 
             for i in range(len(rooms)):
                 if i == v: continue
@@ -229,9 +229,9 @@ class Dungeon:
                 room = rooms[i]
                 dist = rooms[v].getDist(room)
                 
-                hasEdge = (idx, v) in mstEdges or (v, idx) in mstEdges
+                edgeFree  = (idx, v) not in mstEdges and (v, idx) not in mstEdges
 
-                if not hasEdge:
+                if edgeFree:
                     print('minDist')
                     print(minDist)
                     print('dist')
@@ -241,7 +241,16 @@ class Dungeon:
                         minDist = dist
                         idx = i
 
+            if minDist != 999999999:
+                howmanyminsgotset += 1
+            if idx == None:
+                print('seriously?')
             edges.add( (self.mainRooms[v], self.mainRooms[idx]) )
+
+            hasEdge = (idx, v) in mstEdges or (v, idx) in mstEdges
+            print('hasEdge?')
+            if hasEdge:
+                print( 'bad edge = '+str((v, i)) )
             mstEdges.add((v, idx))
 
         #for v in range(len(self.mainRooms)):
@@ -253,6 +262,10 @@ class Dungeon:
         print(mstEdges)
         print(len(self.mainRooms))
         print(len(mstEdges))
+        print('how many mins got set')
+        print(howmanyminsgotset)
+        print('len of edges')
+        print(len(edges))
         return list(edges)
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
