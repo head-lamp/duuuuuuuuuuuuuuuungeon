@@ -176,16 +176,28 @@ class Dungeon:
 
         return min_index
 
-    def getMinimalSpanningTree(self):
+    def getMinimalSpanningTree2(self):
         # set of tuples
         edges = set()
         # number of vertices
         nv = len(self.mainRooms)
+        rooms = self.mainRooms
 
         mstSet = [False] * nv
 
         for v in range(nv):
-            idx = self.minDistRoomIdx(v, mstSet, self.mainRooms)
+            minDist = math.inf
+            min_idx = None
+            for i in range(len(rooms)):
+                if i == v: continue
+
+                room = rooms[i]
+
+                dist = rooms[v].getDist(room)
+                if dist < minDist and mstSet[i] == False:
+                    minDist = dist
+                    idx = i
+
             mstSet[idx] == True
 
             edge = (self.mainRooms[v], self.mainRooms[idx])
@@ -199,6 +211,48 @@ class Dungeon:
 
         for edge in edges:
             print(edge[0].position, edge[1].position)
+        return list(edges)
+
+    def getMinimalSpanningTree(self):
+        edges = set()
+        nv = len(self.mainRooms)
+        rooms = self.mainRooms
+        mstEdges = set()
+
+        for v in range(nv):
+            minDist = 999999999
+            idx = 0
+
+            for i in range(len(rooms)):
+                if i == v: continue
+
+                room = rooms[i]
+                dist = rooms[v].getDist(room)
+                
+                hasEdge = (idx, v) in mstEdges or (v, idx) in mstEdges
+
+                if not hasEdge:
+                    print('minDist')
+                    print(minDist)
+                    print('dist')
+                    print(dist)
+                    if dist < minDist:
+                        print('setting mindist')
+                        minDist = dist
+                        idx = i
+
+            edges.add( (self.mainRooms[v], self.mainRooms[idx]) )
+            mstEdges.add((v, idx))
+
+        #for v in range(len(self.mainRooms)):
+        #    print(v)
+
+        print(len(self.mainRooms))
+        for edge in edges:
+            print(edge[0].position, edge[1].position)
+        print(mstEdges)
+        print(len(self.mainRooms))
+        print(len(mstEdges))
         return list(edges)
 
 def roundm(n, m): return math.floor(((n + m - 1) / m)) * m
@@ -220,7 +274,7 @@ def plot(dungeon):
     #plt.show()
 
 def main():
-    numOfRooms = 20
+    numOfRooms = 40
     radius = 80
     
     dungeon = Dungeon(radius, numOfRooms, 64, 64)
