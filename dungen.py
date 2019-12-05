@@ -4,14 +4,6 @@ import sys
 from pprint import pprint 
 import uuid
 
-from scipy.spatial import Delaunay
-from scipy.sparse import csgraph
-from scipy.sparse import csr_matrix
-import numpy as np
-import matplotlib.pyplot as plt
-
-import networkx as nx
-
 #import pyglet 
 
 max_height = 5000
