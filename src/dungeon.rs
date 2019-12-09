@@ -13,9 +13,9 @@ pub struct Dungeon {
     pub max_width: u32,
 }
 
-pub fn generate_dungeon(num_rooms: u32) -> Dungeon {
+pub fn new(num_rooms: u32) -> Dungeon {
     let mut rooms: Vec<room::Room> = Vec::new();
-    let dungen = Dungeon {
+    let mut dungen = Dungeon {
         rooms: rooms,
         num_rooms: num_rooms,
         max_height: 500,
@@ -42,10 +42,44 @@ fn rand_point_in_circle(radius: f64) -> pos::Pos::<i32> {
 }
 
 impl Dungeon {
-    pub fn place_rooms(self) {
-        for mut x in 0u32..self.num_rooms {
-            println!("x = {}", x);
+    pub fn generate(&mut self) {
+        self.load_rooms();
+        self.place_rooms();
+    }
+
+    fn load_rooms(&mut self) {
+        let mut rng = rand::thread_rng();
+
+        for _ in 0u32..self.num_rooms {
             let pos = rand_point_in_circle(80.0);
+            let w = rng.gen_range(0, self.max_width);
+            let h = rng.gen_range(0, self.max_height);
+            let mut room = room::Room {
+                pos: pos,
+                width: w,
+                height: h,
+                is_main_room: false,
+            };
+            self.rooms.push(room)
         }
+    }
+
+    fn place_rooms(&mut self) {
+        let mut done = false;
+        while !done {
+            let collisions = self.scatter_rooms();
+            if collisions == 0 {
+                done = true;
+            }
+        }
+    }
+
+    fn scatter_rooms(&mut self) -> u32{
+        let mut collisions = 0;
+        for i in 0..self.rooms.len() {
+            for j in 0..self.rooms.len() {
+            }
+        }
+        collisions
     }
 }

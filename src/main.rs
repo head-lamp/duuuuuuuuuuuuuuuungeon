@@ -3,6 +3,6 @@ mod dungeon;
 mod pos;
 
 fn main() {
-    let dungeon = dungeon::generate_dungeon(20);
-    dungeon.place_rooms()
+    let mut dungeon = dungeon::new(20);
+    dungeon.generate();
 }
