@@ -68,16 +68,39 @@ impl Dungeon {
         let mut done = false;
         while !done {
             let collisions = self.scatter_rooms();
+            println!("collisions this round {}", collisions);
             if collisions == 0 {
                 done = true;
             }
         }
     }
 
+    fn room_overlap(&self, i: usize, j:usize) -> bool{
+        let a = &self.rooms[i];
+        let b = &self.rooms[j];
+
+        if a.left() > b.right() || b.left() > a.left() {
+            return false
+        }
+
+        if a.top() < b.bottom() || b.top() < a.bottom() {
+            return false
+        }
+
+        true
+    }
+
     fn scatter_rooms(&mut self) -> u32{
         let mut collisions = 0;
         for i in 0..self.rooms.len() {
             for j in 0..self.rooms.len() {
+                if i == j {
+                    continue;
+                }
+                if self.room_overlap(i as usize, j as usize) {
+                    collisions += 1;
+                    // repulse
+                }
             }
         }
         collisions

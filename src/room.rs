@@ -7,3 +7,21 @@ pub struct Room {
     pub is_main_room: bool,
     // pub id: String,
 }
+
+impl Room {
+    pub fn left(&self) -> i32 {
+        self.pos.x - (self.width as i32 / 2)
+    }
+
+    pub fn right(&self) -> i32 {
+        self.pos.x + (self.width as i32 / 2)
+    }
+
+    pub fn top(&self) -> i32 {
+        self.pos.y + (self.height as i32 / 2)
+    }
+
+    pub fn bottom(&self) -> i32 {
+        self.pos.y - (self.height as i32 / 2)
+    }
+}
