@@ -1,15 +1,29 @@
 use std::ops::{Add, Sub};
 
-#[derive(clone)]
-pub struct Pos<T: Add + Sub + Clone> {
+#[derive(Clone, Debug)]
+pub struct Pos<T> {
     pub x: T,
     pub y: T,
 }
 
-/*
-//todo fixme implement this shit
-impl<T: Add + Clone> Add for Pos<T> { /* ... */ }
+impl<T: Add<Output = T>> Add for Pos<T> {
+    type Output = Self;
 
-impl<T: Sub + Clone> Sub for Pos<T> { 
+    fn add(self, other: Pos<T>) -> Self::Output {
+        Pos::<T> {
+            x: self.x + other.x,
+            y: self.y + other.y
+        }
+    }
 }
-*/
+
+impl<T: Sub<Output = T>> Sub for Pos<T> {
+    type Output = Self;
+
+    fn sub(self, other: Pos<T>) -> Self::Output {
+        Pos::<T> {
+            x: self.x - other.x,
+            y: self.y - other.y
+        }
+    }
+}
