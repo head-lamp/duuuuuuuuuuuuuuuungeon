@@ -25,7 +25,7 @@ pub fn new(num_rooms: u32) -> Dungeon {
     return dungen
 }
 
-fn rand_point_in_circle(radius: f64) -> pos::Pos::<i32> {
+fn rand_point_in_circle(radius: u32) -> pos::Pos::<i32> {
     let mut rng = rand::thread_rng();
     let t = 2.0 * PI * rng.gen::<f64>();
     let u = rng.gen::<f64>() + rng.gen::<f64>();
@@ -36,8 +36,8 @@ fn rand_point_in_circle(radius: f64) -> pos::Pos::<i32> {
         u
     };
 
-    let x = (radius * r * t.cos()) as i32;
-    let y = (radius * r * t.sin()) as i32;
+    let x = (radius as f64 * r * t.cos()) as i32;
+    let y = (radius as f64 * r * t.sin()) as i32;
     pos::Pos{x: x, y: y}
 }
 
@@ -51,7 +51,7 @@ impl Dungeon {
         let mut rng = rand::thread_rng();
 
         for _ in 0u32..self.num_rooms {
-            let pos = rand_point_in_circle(80.0);
+            let pos = rand_point_in_circle(80);
             let w = rng.gen_range(0, self.max_width);
             let h = rng.gen_range(0, self.max_height);
             let mut room = room::Room {
@@ -90,6 +90,20 @@ impl Dungeon {
         true
     }
 
+    fn repulse_room(&mut self, c: usize, e: usize) {
+        let mut rng = rand::thread_rng();
+
+        let a = &self.rooms[c].pos;
+        let b = &self.rooms[e].pos;
+
+        let x = a.x - b.x;
+        let y = a.y - b.y;
+
+        let mut pos = &mut self.rooms[c].pos;
+        pos.x += x + rng.gen_range(-10, 10) * rng.gen_range(-1, 1);
+        pos.y += y + rng.gen_range(-10, 10) * rng.gen_range(-1, 1);
+    }
+
     fn scatter_rooms(&mut self) -> u32{
         let mut collisions = 0;
         for i in 0..self.rooms.len() {
@@ -99,7 +113,7 @@ impl Dungeon {
                 }
                 if self.room_overlap(i as usize, j as usize) {
                     collisions += 1;
-                    // repulse
+                    self.repulse_room(i, j);
                 }
             }
         }
