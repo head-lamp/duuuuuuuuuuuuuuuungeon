@@ -1,6 +1,15 @@
-use std::ops::Sub;
+use std::ops::{Add, Sub};
 
-pub struct Pos<T> {
+#[derive(clone)]
+pub struct Pos<T: Add + Sub + Clone> {
     pub x: T,
     pub y: T,
 }
+
+/*
+//todo fixme implement this shit
+impl<T: Add + Clone> Add for Pos<T> { /* ... */ }
+
+impl<T: Sub + Clone> Sub for Pos<T> { 
+}
+*/

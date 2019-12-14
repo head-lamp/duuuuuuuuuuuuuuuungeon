@@ -18,8 +18,8 @@ pub fn new(num_rooms: u32) -> Dungeon {
     let mut dungen = Dungeon {
         rooms: rooms,
         num_rooms: num_rooms,
-        max_height: 500,
-        max_width: 500,
+        max_height: 500, // TODO FIXME don't hardcode
+        max_width: 500, // TODO FIXME don't hardcode
     };
 
     return dungen
