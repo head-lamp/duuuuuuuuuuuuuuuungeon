@@ -1,5 +1,6 @@
 use crate::room;
 use crate::pos;
+use std::collections::HashSet;
 
 extern crate rand;
 use rand::Rng;
@@ -45,6 +46,7 @@ impl Dungeon {
     pub fn generate(&mut self) {
         self.load_rooms();
         self.place_rooms();
+        self.get_graph();
     }
 
     fn load_rooms(&mut self) {
@@ -61,6 +63,38 @@ impl Dungeon {
                 is_main_room: false,
             };
             self.rooms.push(room)
+        }
+    }
+
+    fn get_dist_between_rooms(&self, i:usize, j:usize) -> i32{
+        let a = &self.rooms[i];
+        let b = &self.rooms[j];
+        ((a.pos.x - b.pos.x).pow(2) + (a.pos.y - b.pos.y).pow(2)).abs()
+    }
+
+    fn get_graph(&self) {
+        let mut edges = HashSet::<(usize, usize)>::new();
+        for i in 0..self.rooms.len() {
+            let mut min_dist = 99999999;
+            let mut idx = i;
+            for j in 0..self.rooms.len() {
+                if i == j {
+                    continue;
+                }
+
+                let dist = self.get_dist_between_rooms(i as usize, j as usize);
+                let hasEdge = edges.contains(&(i, j)) || edges.contains(&(j,i));
+                if !hasEdge && dist < min_dist {
+                    min_dist = dist;
+                    idx = j;
+                }
+            }
+            edges.insert((i,idx));
+        }
+        println!("edges?");
+        for edge in &edges {
+            println!("found edge");
+            // println!("edge = {}", edge);
         }
     }
 

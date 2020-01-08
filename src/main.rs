@@ -3,7 +3,7 @@ mod dungeon;
 mod pos;
 
 fn main() {
-    let mut dungeon = dungeon::new(20);
+    let mut dungeon = dungeon::new(24);
     dungeon.generate();
 
     let a = &dungeon.rooms[0].pos;
