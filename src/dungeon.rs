@@ -157,7 +157,14 @@ impl Dungeon {
         collisions
     }
 
-    fn set_width_height(&mut self) {
+    // TODO FIXME 
+    // this function needs to return the values as dimensions
+    // it'd be easy to just return a Room since that's currently a rect
+    // after this function you need to just find the offset and scoot the rooms over
+    // that way the furthest left is at spot 0
+    // maybe the bottom and top values
+    // need to be swapped or something (reflection?)?
+    fn set_width_height(&mut self) -> {
         let mut max_width = 0;
         let mut max_height = 0;
         let mut min_width = 99999;
