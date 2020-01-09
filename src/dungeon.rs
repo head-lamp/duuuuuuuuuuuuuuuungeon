@@ -10,8 +10,10 @@ const PI:f64 =  std::f64::consts::PI;
 pub struct Dungeon {
     pub rooms: Vec<room::Room>,
     pub num_rooms: u32,
-    pub max_height: u32,
-    pub max_width: u32,
+    pub height: u32,
+    pub width: u32,
+    pub max_room_height: u32,
+    pub max_room_width: u32,
 }
 
 pub fn new(num_rooms: u32) -> Dungeon {
@@ -19,8 +21,10 @@ pub fn new(num_rooms: u32) -> Dungeon {
     let mut dungen = Dungeon {
         rooms: rooms,
         num_rooms: num_rooms,
-        max_height: 500, // TODO FIXME don't hardcode
-        max_width: 500, // TODO FIXME don't hardcode
+        max_room_height: 500, // TODO FIXME don't hardcode
+        max_room_width: 500, // TODO FIXME don't hardcode
+        width: 0,
+        height: 0,
     };
 
     return dungen
@@ -46,7 +50,10 @@ impl Dungeon {
     pub fn generate(&mut self) {
         self.load_rooms();
         self.place_rooms();
-        self.get_graph();
+        self.set_width_height();
+        let edges = self.get_edges();
+
+        self.move_rooms_towards_origin();
     }
 
     fn load_rooms(&mut self) {
@@ -54,8 +61,8 @@ impl Dungeon {
 
         for _ in 0u32..self.num_rooms {
             let pos = rand_point_in_circle(80);
-            let w = rng.gen_range(0, self.max_width);
-            let h = rng.gen_range(0, self.max_height);
+            let w = rng.gen_range(0, self.max_room_width);
+            let h = rng.gen_range(0, self.max_room_height);
             let mut room = room::Room {
                 pos: pos,
                 width: w,
@@ -66,13 +73,13 @@ impl Dungeon {
         }
     }
 
-    fn get_dist_between_rooms(&self, i:usize, j:usize) -> i32{
+    fn get_dist_between_rooms(&self, i:usize, j:usize) -> u32{
         let a = &self.rooms[i];
         let b = &self.rooms[j];
-        ((a.pos.x - b.pos.x).pow(2) + (a.pos.y - b.pos.y).pow(2)).abs()
+        ((a.pos.x - b.pos.x).pow(2) + (a.pos.y - b.pos.y).pow(2)).abs() as u32
     }
 
-    fn get_graph(&self) {
+    fn get_edges(&self) -> HashSet::<(usize, usize)> {
         let mut edges = HashSet::<(usize, usize)>::new();
         for i in 0..self.rooms.len() {
             let mut min_dist = 99999999;
@@ -91,11 +98,7 @@ impl Dungeon {
             }
             edges.insert((i,idx));
         }
-        println!("edges?");
-        for edge in &edges {
-            println!("found edge");
-            // println!("edge = {}", edge);
-        }
+        return edges;
     }
 
     fn place_rooms(&mut self) {
@@ -152,5 +155,33 @@ impl Dungeon {
             }
         }
         collisions
+    }
+
+    fn set_width_height(&mut self) {
+        let mut max_width = 0;
+        let mut max_height = 0;
+        let mut min_width = 99999;
+        let mut min_height = 99999;
+        for room in &self.rooms {
+            if room.right() > max_width {
+                max_width = room.right();
+            }
+            if room.left() < min_width {
+                min_width = room.left();
+            }
+            if room.top() > max_height {
+                max_height = room.top();
+            }
+            if room.bottom() < min_height {
+                min_height = room.bottom();
+            }
+        }
+        println!("max width = {}",max_width);
+        println!("min width = {}",min_width);
+        println!("max height = {}",max_height);
+        println!("min height = {}",min_height);
+    }
+
+    fn move_rooms_towards_origin(&mut self) {
     }
 }

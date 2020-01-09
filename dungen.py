@@ -278,7 +278,7 @@ def plot(dungeon):
     #plt.show()
 
 def main():
-    numOfRooms = 40
+    numOfRooms = 10000
     radius = 80
     
     dungeon = Dungeon(radius, numOfRooms, 64, 64)
