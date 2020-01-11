@@ -10,6 +10,7 @@ const PI:f64 =  std::f64::consts::PI;
 pub struct Dungeon {
     pub rooms: Vec<room::Room>,
     pub num_rooms: u32,
+    pub perimeter_room: room::Room,
     pub height: u32,
     pub width: u32,
     pub max_room_height: u32,
@@ -18,8 +19,14 @@ pub struct Dungeon {
 
 pub fn new(num_rooms: u32) -> Dungeon {
     let mut rooms: Vec<room::Room> = Vec::new();
+    let mut perimeter_room = room::Room {
+            pos: pos::Pos{ x: 0 as i32, y: 0 as i32},
+            width: 0,
+            height: 0,
+    };
     let mut dungen = Dungeon {
         rooms: rooms,
+        perimeter_room: perimeter_room,
         num_rooms: num_rooms,
         max_room_height: 500, // TODO FIXME don't hardcode
         max_room_width: 500, // TODO FIXME don't hardcode
@@ -50,10 +57,9 @@ impl Dungeon {
     pub fn generate(&mut self) {
         self.load_rooms();
         self.place_rooms();
-        self.set_width_height();
         let edges = self.get_edges();
 
-        self.move_rooms_towards_origin();
+        self.make_perimeter_room();
     }
 
     fn load_rooms(&mut self) {
@@ -67,7 +73,6 @@ impl Dungeon {
                 pos: pos,
                 width: w,
                 height: h,
-                is_main_room: false,
             };
             self.rooms.push(room)
         }
@@ -157,38 +162,29 @@ impl Dungeon {
         collisions
     }
 
-    // TODO FIXME 
-    // this function needs to return the values as dimensions
-    // it'd be easy to just return a Room since that's currently a rect
-    // after this function you need to just find the offset and scoot the rooms over
-    // that way the furthest left is at spot 0
-    // maybe the bottom and top values
-    // need to be swapped or something (reflection?)?
-    fn set_width_height(&mut self) -> {
-        let mut max_width = 0;
-        let mut max_height = 0;
-        let mut min_width = 99999;
-        let mut min_height = 99999;
+    fn make_perimeter_room(&mut self) {
+        let mut right = 0;
+        let mut top = 0;
+        let mut left = 99999;
+        let mut bottom = 99999;
         for room in &self.rooms {
-            if room.right() > max_width {
-                max_width = room.right();
+            if room.right() > right {
+                right = room.right();
             }
-            if room.left() < min_width {
-                min_width = room.left();
+            if room.left() < left {
+                left = room.left();
             }
-            if room.top() > max_height {
-                max_height = room.top();
+            if room.top() > top {
+                top = room.top();
             }
-            if room.bottom() < min_height {
-                min_height = room.bottom();
+            if room.bottom() < bottom {
+                bottom = room.bottom();
             }
         }
-        println!("max width = {}",max_width);
-        println!("min width = {}",min_width);
-        println!("max height = {}",max_height);
-        println!("min height = {}",min_height);
-    }
 
-    fn move_rooms_towards_origin(&mut self) {
+        self.perimeter_room.pos.x = (right + left) / 2; 
+        self.perimeter_room.pos.y = (top + bottom) / 2;
+        self.perimeter_room.width = (left - right).abs() as u32;
+        self.perimeter_room.height = (top - bottom).abs() as u32;
     }
 }
