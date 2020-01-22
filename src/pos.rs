@@ -1,6 +1,7 @@
 use std::ops::{Add, Sub};
+use specs::prelude::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Component)]
 pub struct Pos<T> {
     pub x: T,
     pub y: T,

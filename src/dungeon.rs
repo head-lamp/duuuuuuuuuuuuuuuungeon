@@ -59,6 +59,7 @@ impl Dungeon {
         self.place_rooms();
         let edges = self.get_edges();
 
+        // basically create walls around the wall
         self.make_perimeter_room();
     }
 
@@ -184,7 +185,7 @@ impl Dungeon {
 
         self.perimeter_room.pos.x = (right + left) / 2; 
         self.perimeter_room.pos.y = (top + bottom) / 2;
-        self.perimeter_room.width = (left - right).abs() as u32;
-        self.perimeter_room.height = (top - bottom).abs() as u32;
+        self.perimeter_room.width = (left - right).abs() as u32 + 2;
+        self.perimeter_room.height = (top - bottom).abs() as u32 + 2;
     }
 }
