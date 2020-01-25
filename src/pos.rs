@@ -1,7 +1,9 @@
 use std::ops::{Add, Sub};
-use specs::prelude::*;
 
-#[derive(Clone, Debug, Component)]
+
+// TODO FIXME need to get rid of generics or figure out wtf
+// todo to fix it
+#[derive(Clone, Debug/*, Component */)]
 pub struct Pos<T> {
     pub x: T,
     pub y: T,
