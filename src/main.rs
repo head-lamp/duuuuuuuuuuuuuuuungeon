@@ -1,6 +1,7 @@
 mod room;
 mod dungeon;
 mod pos;
+mod tiles;
 
 fn main() {
     let mut dungeon = dungeon::new(50);

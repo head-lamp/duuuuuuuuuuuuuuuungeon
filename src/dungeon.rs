@@ -1,5 +1,7 @@
 use crate::room;
 use crate::pos;
+use crate::tiles;
+
 use std::collections::HashSet;
 
 extern crate rand;
@@ -187,5 +189,13 @@ impl Dungeon {
         self.perimeter_room.pos.y = (top + bottom) / 2;
         self.perimeter_room.width = (left - right).abs() as u32 + 2;
         self.perimeter_room.height = (top - bottom).abs() as u32 + 2;
+    }
+
+    fn make_tile_matrix(&mut self) -> Vec::<tiles::Tile> {
+        let mut tiles = Vec::new();
+        tiles.push(tiles::Tile {
+            tiletype: tiles::TileType::Floor,
+        });
+        tiles
     }
 }

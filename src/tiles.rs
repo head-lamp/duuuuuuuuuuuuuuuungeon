@@ -1,5 +1,9 @@
 #[derive(PartialEq, Copy, Clone)]
-enum TileType {
+pub enum TileType {
     Wall,
     Floor,
+}
+
+pub struct Tile {
+    pub tiletype: TileType,
 }
